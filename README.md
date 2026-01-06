@@ -71,7 +71,20 @@ pip install -r requirements.txt
 - **Database**: 默认使用 SQLite，可修改 `database.url` 切换至 PostgreSQL。
 - **Allow Settings Edit**: 控制是否允许在 Web 界面修改系统配置（`app.allow_settings_edit`，默认 `false`，界面仅只读）。
 
-### 3. 启动服务
+### 3. 提示词配置 (可选)
+
+项目支持自定义各个环节的 AI 提示词（System Prompts），配置文件位于 `config/prompts.yaml`。
+您可以根据需要调整各阶段的 `system` 提示词或 `user_template` 模板，以控制生成内容的风格和质量。
+
+**支持配置的模块**：
+- **script_generation**: 剧本生成
+- **character_design**: 角色提取与设计
+- **scene_design**: 场景提取与设计
+- **storyboard_generation**: 分镜脚本生成
+- **image_prompt_generation**: 画面绘图提示词生成
+- **video_prompt_generation**: 视频生成提示词生成
+
+### 4. 启动服务
 
 ```bash
 python run.py
