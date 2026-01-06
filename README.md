@@ -69,7 +69,6 @@ pip install -r requirements.txt
 - **Access Key / Secret Key**: 用于调用图像/视频生成服务及 TOS。
 - **Platform**: 指定默认平台 (`volcengine` 或 `byteplus`)。
 - **Database**: 默认使用 SQLite，可修改 `database.url` 切换至 PostgreSQL。
-- **Allow Settings Edit**: 控制是否允许在 Web 界面修改系统配置（`app.allow_settings_edit`，默认 `false`，界面仅只读）。
 
 ### 3. 提示词配置 (可选)
 
