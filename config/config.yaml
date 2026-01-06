@@ -1,0 +1,105 @@
+app:
+  allow_settings_edit: false
+  concurrency:
+    image: 10
+    prompt: 10
+    video: 10
+  aspect_ratios:
+  - '21:9'
+  - '16:9'
+  - '4:3'
+  - '1:1'
+  - '3:4'
+  - '9:16'
+  data_dir: ./data/aigc/
+  history_file: ./data/history.json
+  max_history: 100
+  project_dir: ./data/projects
+  resolutions:
+  - 480p
+  - 720p
+  - 1080p
+  script_styles:
+  - 现代都市
+  - 古装武侠
+  - 科幻未来
+  - 悬疑惊悚
+  - 轻松喜剧
+  - 温情治愈
+  temp_dir: ./data/temp
+  video_format: mp4
+  visual_styles:
+  - 真人
+  - 动画
+database:
+  # SQLite (默认)
+  url: sqlite:///./data/short_drama.db
+  # PostgreSQL (示例)
+  # url: postgresql://user:password@localhost:5432/short_drama
+logging:
+  file: ./logs/app.log
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  level: INFO
+platform: volcengine
+platforms:
+  byteplus:
+    access_key: YOUR_ACCESS_KEY
+    ark_api_key: YOUR_ARK_API_KEY
+    endpoints:
+      image: https://ark.ap-southeast.bytepluses.com/api/v3
+      llm: https://ark.ap-southeast.bytepluses.com/api/v3
+      video: https://ark.ap-southeast.bytepluses.com/api/v3
+    models:
+      image:
+        model_id: seedream-4-0-250828
+        size: 2k
+        watermark: true
+      llm:
+        model_id: seed-1-6-250915
+      video:
+        model_id: seedance-1-5-pro-251215
+    secret_key: YOUR_SECRET_KEY
+    tos:
+      bucket_directory: shortdrama/
+      bucket_name: your-bucket-name
+      enable: true
+      endpoint: tos-ap-southeast-1.bytepluses.com
+      region: ap-southeast-1
+  volcengine:
+    access_key: YOUR_ACCESS_KEY
+    ark_api_key: YOUR_ARK_API_KEY
+    endpoints:
+      image: https://ark.cn-beijing.volces.com/api/v3
+      llm: https://ark.cn-beijing.volces.com/api/v3
+      video: https://ark.cn-beijing.volces.com/api/v3
+    models:
+      image:
+        model_id: doubao-seedream-4-5-251128
+        size: 2k
+        steps: 30
+        watermark: true
+      llm:
+        max_tokens: 4096
+        model_id: doubao-seed-1-6-251015
+        model_name: doubao-pro-32k
+        temperature: 0.7
+      video:
+        fps: 24
+        model_id: doubao-seedance-1-5-pro-251215
+    secret_key: YOUR_SECRET_KEY
+    tos:
+      bucket_directory: shortdrama/
+      bucket_name: your-bucket-name
+      enable: true
+      endpoint: tos-cn-beijing.volces.com
+      region: cn-beijing
+redis:
+  db: 0
+  enable: true
+  host: localhost
+  password: ''
+  port: 6379
+web:
+  server:
+    host: 127.0.0.1
+    port: 9001

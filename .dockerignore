@@ -1,0 +1,32 @@
+# Ignore everything by default is not a good strategy for dockerignore, usually we whitelist. 
+# But standard practice is to ignore what we don't want.
+
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.gitignore
+.dockerignore
+.idea
+.vscode
+nginx_local
+docker-compose.yml
+docker
+logs
+data
+# We do want to include source code, requirements.txt, config (maybe default config)

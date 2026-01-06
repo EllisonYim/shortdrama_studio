@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="referrer" content="no-referrer" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>短剧制作平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb', // blue-600
+            secondary: '#475569', // slate-600
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-screen bg-gray-50 text-slate-800 font-sans overflow-hidden flex">
+
+  <!-- Left Sidebar -->
+  <aside class="w-64 bg-white border-r border-gray-200 flex flex-col h-full shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-10">
+    <div class="p-6">
+      <div class="flex items-center space-x-3 mb-8">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">S</div>
+        <span class="text-xl font-bold text-slate-800 tracking-tight">ShortDrama</span>
+      </div>
+      
+      <div class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wider px-2">制作流程</div>
+      <nav id="steps" class="space-y-1 mb-8">
+        <button data-step="input" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center group bg-blue-50 text-blue-700 shadow-sm border border-blue-100">
+          <span class="w-8 h-8 mr-3 flex items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm">✨</span>
+          创建项目
+        </button>
+        <button data-step="script" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 flex items-center group">
+          <span class="w-8 h-8 mr-3 flex items-center justify-center rounded-lg bg-gray-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">1</span>
+          剧本创作
+        </button>
+        <button data-step="characters" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 flex items-center group">
+          <span class="w-8 h-8 mr-3 flex items-center justify-center rounded-lg bg-gray-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">2</span>
+          角色设计
+        </button>
+        <button data-step="scenes" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 flex items-center group">
+          <span class="w-8 h-8 mr-3 flex items-center justify-center rounded-lg bg-gray-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">3</span>
+          场景设计
+        </button>
+        <button data-step="storyboard" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 flex items-center group">
+          <span class="w-8 h-8 mr-3 flex items-center justify-center rounded-lg bg-gray-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">4</span>
+          分镜生成
+        </button>
+        <button data-step="prompts" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 flex items-center group">
+          <span class="w-8 h-8 mr-3 flex items-center justify-center rounded-lg bg-gray-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">5</span>
+          提示词优化
+        </button>
+        <button data-step="images" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 flex items-center group">
+          <span class="w-8 h-8 mr-3 flex items-center justify-center rounded-lg bg-gray-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">6</span>
+          首图生成
+        </button>
+        <button data-step="videos" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 flex items-center group">
+          <span class="w-8 h-8 mr-3 flex items-center justify-center rounded-lg bg-gray-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">7</span>
+          视频生成
+        </button>
+        <button data-step="merge" class="w-full text-left px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-blue-600 transition-all duration-200 flex items-center group">
+          <span class="w-8 h-8 mr-3 flex items-center justify-center rounded-lg bg-gray-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">8</span>
+          视频拼接
+        </button>
+      </nav>
+      
+      <div class="px-2 mb-4 relative z-20">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">历史项目</span>
+            <span class="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-500" id="projectCount">0</span>
+        </div>
+        <div class="relative">
+            <input type="text" id="historySearch" placeholder="搜索项目..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-1.5 pl-8 pr-8 text-xs focus:border-blue-500 focus:ring-1 focus:ring-blue-100 outline-none transition-all">
+            <svg class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <button id="toggleFilter" class="absolute right-1 top-1 p-1 text-gray-400 hover:text-blue-600 rounded hover:bg-gray-100 transition-all" title="高级筛选">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Filter Panel moved to body -->
+      </div>
+      <div id="history-list" class="flex-1 overflow-y-auto -mx-2 px-2 space-y-1 max-h-[200px] scrollbar-hide">
+        <!-- History items -->
+      </div>
+    </div>
+    
+    <div class="mt-auto p-4 border-t border-gray-100 bg-gray-50/50 space-y-2">
+      <!-- Buttons moved to header -->
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col min-w-0 bg-gray-50/50">
+    <!-- Top Header / Tabs -->
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
+      <div class="flex items-center space-x-1 bg-gray-100/50 p-1 rounded-lg">
+        <button id="tab-input" class="px-4 py-1.5 rounded-md text-sm font-medium bg-white text-blue-600 shadow-sm transition-all">输入</button>
+        <button id="tab-script" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">剧本</button>
+        <button id="tab-characters" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">角色</button>
+        <button id="tab-scenes" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">场景</button>
+        <button id="tab-storyboard" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">分镜</button>
+        <button id="tab-prompts" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">提示词</button>
+        <button id="tab-images" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">首图</button>
+        <button id="tab-videos" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">视频</button>
+        <button id="tab-output" class="px-4 py-1.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">成品</button>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <button id="logsBtn" class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="系统日志">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        </button>
+        <button id="settingsBtn" class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="系统设置">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </button>
+        <div class="w-px h-6 bg-gray-200 mx-2"></div>
+        <div id="status-container" class="flex items-center px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200">
+          <div id="status-dot" class="w-2 h-2 rounded-full bg-gray-300 mr-2"></div>
+          <span id="status" class="text-xs text-gray-500 font-medium">准备就绪</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <div class="flex-1 overflow-y-auto p-8 scroll-smooth" id="main-scroll">
+      <div class="max-w-6xl mx-auto">
+        
+        <!-- View: Input -->
+        <div id="view-input" class="space-y-6 animate-fade-in">
+          <div class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-slate-800 mb-3">开始您的创作之旅</h1>
+            <p class="text-slate-500">AI 驱动的一站式短剧创作平台</p>
+          </div>
+          
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-xl shadow-gray-200/50 p-8">
+            <div class="flex space-x-8 mb-8 border-b border-gray-100 pb-6">
+              <label class="flex items-center space-x-3 cursor-pointer group">
+                <div class="relative flex items-center justify-center">
+                  <input type="radio" name="mode" value="topic" checked class="peer sr-only">
+                  <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-blue-600 peer-checked:bg-blue-600 transition-all"></div>
+                  <div class="absolute w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                </div>
+                <span class="text-slate-700 font-medium group-hover:text-blue-600 transition-colors">基于主题创作</span>
+              </label>
+              <label class="flex items-center space-x-3 cursor-pointer group">
+                <div class="relative flex items-center justify-center">
+                  <input type="radio" name="mode" value="script" class="peer sr-only">
+                  <div class="w-5 h-5 border-2 border-gray-300 rounded-full peer-checked:border-blue-600 peer-checked:bg-blue-600 transition-all"></div>
+                  <div class="absolute w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                </div>
+                <span class="text-slate-700 font-medium group-hover:text-blue-600 transition-colors">已有剧本创作</span>
+              </label>
+            </div>
+
+            <div id="visualSettings" class="bg-gray-50 border border-gray-100 rounded-xl p-6 mb-6">
+               <div class="mb-6">
+                  <label class="block text-sm font-semibold text-slate-700 mb-3">画面比例</label>
+                  <div class="flex flex-wrap gap-3" id="aspectRatioSelector">
+                     <button type="button" data-value="21:9" class="ratio-btn px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 text-sm font-medium transition-all flex flex-col items-center gap-1 min-w-[70px]">
+                        <span class="w-6 h-3 border-2 border-current rounded-[2px] opacity-50"></span>
+                        21:9
+                     </button>
+                     <button type="button" data-value="16:9" class="ratio-btn px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 text-sm font-medium transition-all flex flex-col items-center gap-1 min-w-[70px]">
+                        <span class="w-5 h-3 border-2 border-current rounded-[2px] opacity-50"></span>
+                        16:9
+                     </button>
+                     <button type="button" data-value="4:3" class="ratio-btn px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 text-sm font-medium transition-all flex flex-col items-center gap-1 min-w-[70px]">
+                        <span class="w-4 h-3 border-2 border-current rounded-[2px] opacity-50"></span>
+                        4:3
+                     </button>
+                     <button type="button" data-value="1:1" class="ratio-btn px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 text-sm font-medium transition-all flex flex-col items-center gap-1 min-w-[70px]">
+                        <span class="w-3 h-3 border-2 border-current rounded-[2px] opacity-50"></span>
+                        1:1
+                     </button>
+                     <button type="button" data-value="3:4" class="ratio-btn px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 text-sm font-medium transition-all flex flex-col items-center gap-1 min-w-[70px]">
+                        <span class="w-3 h-4 border-2 border-current rounded-[2px] opacity-50"></span>
+                        3:4
+                     </button>
+                     <button type="button" data-value="9:16" class="ratio-btn px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-blue-600 hover:border-blue-200 text-sm font-medium transition-all flex flex-col items-center gap-1 min-w-[70px]">
+                        <span class="w-3 h-5 border-2 border-current rounded-[2px] opacity-50"></span>
+                        9:16
+                     </button>
+                  </div>
+               </div>
+               <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-3">分辨率</label>
+                  <div class="flex gap-3 bg-gray-200/50 p-1 rounded-lg inline-flex" id="resolutionSelector">
+                     <button type="button" data-value="480p" class="res-btn px-6 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">480p</button>
+                     <button type="button" data-value="720p" class="res-btn px-6 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">720p</button>
+                     <button type="button" data-value="1080p" class="res-btn px-6 py-2 rounded-md text-sm font-medium text-gray-500 hover:text-gray-900 transition-all">1080p</button>
+                  </div>
+               </div>
+            </div>
+
+            <div id="topicInputs" class="space-y-6">
+              <div class="grid grid-cols-2 gap-6">
+                <div class="col-span-2">
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">创作主题</label>
+                  <input id="topic" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-base focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all placeholder-gray-400" placeholder="例如：一个程序员意外获得超能力，在科技公司发生的爆笑故事..." />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">预估时长 (分钟)</label>
+                  <input id="duration" type="number" min="1" max="10" value="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all" />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">受众群体</label>
+                  <select id="audience" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[right:1rem_center] bg-no-repeat">
+                    <option>年轻人</option>
+                    <option>职场人士</option>
+                    <option>学生</option>
+                    <option>家庭主妇</option>
+                    <option>全年龄段</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">剧本风格</label>
+                  <select id="style" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[right:1rem_center] bg-no-repeat">
+                    <option>现代都市</option>
+                    <option>古装武侠</option>
+                    <option>科幻未来</option>
+                    <option>悬疑惊悚</option>
+                    <option>轻松喜剧</option>
+                    <option>温情治愈</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">视觉风格</label>
+                  <select id="visualStyle" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[right:1rem_center] bg-no-repeat">
+                    <option>真人</option>
+                    <option>动画</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div id="scriptInputs" class="hidden space-y-4">
+              <label class="block text-sm font-semibold text-slate-700 mb-2">剧本来源</label>
+              <div class="flex space-x-4 mb-2">
+                 <button type="button" id="btnScriptModeText" class="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 font-medium">文本输入</button>
+                 <button type="button" id="btnScriptModeFile" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 font-medium transition-colors">文件上传</button>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">视觉风格</label>
+                <select id="visualStyleScript" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[right:1rem_center] bg-no-repeat">
+                  <option>真人</option>
+                  <option>动画</option>
+                </select>
+              </div>
+
+              <div id="scriptInputTextContainer">
+                <textarea id="scriptTextInput" class="w-full min-h-[200px] bg-gray-50 border border-gray-200 rounded-xl p-4 text-base focus:border-blue-500 focus:ring-4 focus:ring-blue-50 outline-none transition-all placeholder-gray-400 resize-y" placeholder="在此处粘贴您的完整剧本..."></textarea>
+              </div>
+              
+              <div id="scriptInputFileContainer" class="hidden">
+                 <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors bg-gray-50/50">
+                    <input type="file" id="scriptFileInput" accept=".txt,.md" class="hidden">
+                    <label for="scriptFileInput" class="cursor-pointer">
+                       <div class="text-4xl mb-2">📄</div>
+                       <p class="text-sm text-gray-600 font-medium">点击上传文本文件 (.txt, .md)</p>
+                       <p id="fileName" class="text-xs text-gray-400 mt-2"></p>
+                    </label>
+                 </div>
+              </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
+              <span id="createStatus" class="text-sm text-blue-600 font-medium animate-pulse"></span>
+              <button id="createBtn" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 hover:-translate-y-0.5 transition-all flex items-center">
+                <span>开始创作</span>
+                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- View: Script -->
+        <div id="view-script" class="hidden space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-slate-800">剧本编辑器</h2>
+            <div class="flex space-x-3">
+              <button id="btnEditScript" class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-slate-600 hover:bg-gray-50 font-medium transition-all shadow-sm flex items-center">
+                <span class="mr-2">✏️</span> 编辑模式
+              </button>
+              <button id="btnSaveScript" class="hidden px-4 py-2 rounded-lg bg-green-50 border border-green-200 text-green-700 hover:bg-green-100 font-medium transition-all shadow-sm flex items-center">
+                <span class="mr-2">💾</span> 保存修改
+              </button>
+              <button id="btnOptimizeScript" class="px-4 py-2 rounded-lg bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100 font-medium transition-all shadow-sm flex items-center">
+                <span class="mr-2">✨</span> AI 优化
+              </button>
+            </div>
+          </div>
+          
+          <div class="relative">
+            <textarea id="outScript" readonly class="w-full min-h-[600px] bg-white border border-gray-200 rounded-2xl p-8 text-lg leading-relaxed text-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-50 transition-all resize-y shadow-sm font-serif"></textarea>
+            <div id="scriptLoading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-10">
+              <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+              <p class="text-blue-600 font-medium animate-pulse">AI 正在撰写剧本中...</p>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-4">
+            <button id="btnNextToCharacters" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 hover:-translate-y-0.5 transition-all flex items-center">
+              <span>下一步：角色设计</span>
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- View: Characters -->
+        <div id="view-characters" class="hidden space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-slate-800">角色创作</h2>
+            <div class="flex space-x-3">
+                <button id="btnGenChars" class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 font-medium transition-all shadow-sm">
+                  1. 重新提取角色
+                </button>
+                <button id="btnGenCharPrompts" class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 font-medium transition-all shadow-sm">
+                  2. 生成提示词
+                </button>
+                <button id="btnGenCharImages" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md transition-all">
+                  3. 生成立绘
+                </button>
+            </div>
+          </div>
+          <div class="relative min-h-[400px]">
+             <div id="charList" class="grid grid-cols-1 gap-6"></div>
+             <div id="charEmpty" class="text-gray-500 text-center py-20 hidden">暂无角色数据，请点击“重新提取角色”</div>
+             <div id="charLoading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-20">
+                <div class="w-12 h-12 border-4 border-blue-400 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                <p class="text-blue-400 font-medium animate-pulse">AI 正在创作中...</p>
+             </div>
+          </div>
+          <div class="flex justify-end pt-4">
+            <button id="btnNextToScenes" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 hover:-translate-y-0.5 transition-all flex items-center">
+              <span>下一步：场景设计</span>
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- View: Scenes -->
+        <div id="view-scenes" class="hidden space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-slate-800">场景创作</h2>
+            <div class="flex space-x-3">
+                <button id="btnGenScenes" class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 font-medium transition-all shadow-sm">
+                  1. 重新提取场景
+                </button>
+                <button id="btnGenScenePrompts" class="px-4 py-2 rounded-lg bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 font-medium transition-all shadow-sm">
+                  2. 生成提示词
+                </button>
+                <button id="btnGenSceneImages" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md transition-all">
+                  3. 生成场景图
+                </button>
+            </div>
+          </div>
+          <div class="relative min-h-[400px]">
+             <div id="sceneList" class="grid grid-cols-1 gap-6"></div>
+             <div id="sceneEmpty" class="text-gray-500 text-center py-20 hidden">暂无场景数据，请点击“重新提取场景”</div>
+             <div id="sceneLoading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-20">
+                <div class="w-12 h-12 border-4 border-blue-400 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                <p class="text-blue-400 font-medium animate-pulse">AI 正在创作中...</p>
+             </div>
+          </div>
+          <div class="flex justify-end pt-4">
+            <button id="btnNextToStoryboard" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 hover:-translate-y-0.5 transition-all flex items-center">
+              <span>下一步：生成分镜</span>
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- View: Storyboard -->
+        <div id="view-storyboard" class="hidden space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-slate-800">分镜脚本</h2>
+            <button id="btnGenStoryboard" class="px-5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md transition-all flex items-center">
+              <span class="mr-2">🔄</span> 重新生成分镜
+            </button>
+          </div>
+          <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-xl min-h-[500px] relative">
+             <div id="storyboardList" class="space-y-6"></div>
+             <div id="storyboardEmpty" class="text-gray-500 text-center py-20 hidden">暂无分镜数据，请先生成</div>
+             <div id="storyboardLoading" class="hidden absolute inset-0 bg-white/90 backdrop-blur-sm rounded-2xl flex flex-col items-center justify-center z-20">
+                <div class="w-12 h-12 border-4 border-blue-400 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                <p class="text-blue-400 font-medium animate-pulse">AI 正在生成分镜中...</p>
+             </div>
+          </div>
+          <div class="flex justify-end pt-4 space-x-4">
+            <button id="btnSaveStoryboard" class="hidden px-6 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:shadow-green-300 hover:-translate-y-0.5 transition-all flex items-center">
+               <span class="mr-2">💾</span> 保存修改
+            </button>
+            <button id="btnNextToPrompts" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 hover:-translate-y-0.5 transition-all flex items-center">
+              <span>下一步：生成提示词</span>
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- View: Prompts -->
+        <div id="view-prompts" class="hidden space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-slate-800">提示词生成</h2>
+            <div class="flex space-x-3 items-center">
+               <div class="flex items-center space-x-2 bg-white px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
+                  <span class="text-sm text-gray-600 font-medium">首图生成数量:</span>
+                  <select id="globalImgCount" class="text-sm font-bold text-blue-600 outline-none bg-transparent cursor-pointer appearance-none pr-6 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232563eb%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[right:center] bg-no-repeat">
+                    <option value="1">1 张</option>
+                    <option value="2">2 张</option>
+                    <option value="3">3 张</option>
+                    <option value="4">4 张</option>
+                  </select>
+               </div>
+               <button id="btnGenPrompts" class="px-5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md transition-all flex items-center">
+                 <span class="mr-2">🔄</span> 重新生成提示词
+               </button>
+            </div>
+          </div>
+          <div class="relative min-h-[200px]">
+              <div id="promptsList" class="space-y-6"></div>
+              <div id="promptsLoading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-20">
+                <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                <p class="text-blue-600 font-medium animate-pulse">AI 正在生成提示词中...</p>
+              </div>
+          </div>
+          <div class="flex justify-end pt-4 space-x-4">
+            <button id="btnSavePrompts" class="hidden px-6 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:shadow-green-300 hover:-translate-y-0.5 transition-all flex items-center">
+               <span class="mr-2">💾</span> 保存修改
+            </button>
+            <button id="btnNextToImages" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 hover:-translate-y-0.5 transition-all flex items-center">
+              <span>下一步：生成首图</span>
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- View: Images -->
+        <div id="view-images" class="hidden space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-slate-800">分镜首图</h2>
+            <button id="btnGenImages" class="px-5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md transition-all flex items-center">
+              <span class="mr-2">🎨</span> 开始生成图片
+            </button>
+          </div>
+          <div class="relative min-h-[200px]">
+              <div id="images" class="space-y-8"></div>
+              <div id="imagesLoading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-20">
+                <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                <p class="text-blue-600 font-medium animate-pulse">AI 正在生成首图中...</p>
+              </div>
+          </div>
+          <div class="flex justify-end pt-4">
+            <button id="btnNextToVideos" class="px-8 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 hover:-translate-y-0.5 transition-all flex items-center">
+              <span>下一步：生成视频</span>
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Image Zoom Modal -->
+        <div id="imgZoomModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-[100] flex items-center justify-center cursor-zoom-out opacity-0 transition-opacity duration-300" onclick="this.classList.add('hidden'); this.classList.remove('opacity-100');">
+           <img id="imgZoomContent" class="max-w-[90vw] max-h-[90vh] rounded-lg shadow-2xl transform scale-95 transition-transform duration-300" />
+        </div>
+
+        <!-- View: Videos -->
+        <div id="view-videos" class="hidden space-y-6 animate-fade-in">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-slate-800">分镜视频</h2>
+            <button id="btnGenVideos" class="px-5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md transition-all flex items-center">
+              <span class="mr-2">🎥</span> 开始生成视频
+            </button>
+          </div>
+          <div class="relative min-h-[200px]">
+              <div id="videos" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+              <div id="videosLoading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center z-20">
+                <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                <p class="text-blue-600 font-medium animate-pulse">AI 正在生成视频中...</p>
+              </div>
+          </div>
+          <div class="flex justify-end pt-4">
+            <button id="btnMerge" class="px-8 py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:shadow-green-300 hover:-translate-y-0.5 transition-all flex items-center">
+              <span>下一步：拼接成片</span>
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- View: Output -->
+        <div id="view-output" class="hidden space-y-6 animate-fade-in">
+          <div class="text-center mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">最终成品</h2>
+            <p class="text-slate-500">恭喜！您的短剧已制作完成</p>
+          </div>
+          <div id="finalVideo" class="flex flex-col items-center"></div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-opacity">
+    <div class="bg-white rounded-2xl w-[600px] shadow-2xl flex flex-col max-h-[90vh] animate-scale-in">
+      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
+        <h3 class="text-lg font-bold text-gray-800">⚙️ 系统设置</h3>
+        <button id="closeSettings" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+      </div>
+      <div class="p-8 overflow-y-auto space-y-8">
+        <!-- Platform Selection -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-sm text-gray-900 uppercase tracking-wider flex items-center">
+            <span class="w-1 h-4 bg-slate-800 mr-2 rounded-full"></span>
+            平台选择
+          </h4>
+          <div>
+             <select id="conf_platform" class="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[right:1rem_center] bg-no-repeat">
+                <option value="volcengine">Volcengine</option>
+                <option value="byteplus">BytePlus</option>
+             </select>
+          </div>
+        </div>
+
+        <!-- Platform Config -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-sm text-gray-900 uppercase tracking-wider flex items-center">
+            <span class="w-1 h-4 bg-blue-600 mr-2 rounded-full"></span>
+            <span id="platformConfigTitle">平台配置</span>
+          </h4>
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">Ark API Key</label>
+              <input id="conf_ark_key" type="password" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all" placeholder="sk-..." />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">Access Key (Legacy)</label>
+              <input id="conf_ak" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">Secret Key</label>
+              <input id="conf_sk" type="password" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Storage Config -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-sm text-gray-900 uppercase tracking-wider flex items-center">
+            <span class="w-1 h-4 bg-orange-500 mr-2 rounded-full"></span>
+            存储配置
+          </h4>
+          <div class="grid grid-cols-2 gap-5">
+            <div class="col-span-2 flex items-center mb-2">
+               <input type="checkbox" id="conf_tos_enable" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+               <label for="conf_tos_enable" class="ml-2 text-sm font-medium text-gray-700">启用 TOS 对象存储</label>
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">Endpoint</label>
+              <input id="conf_tos_endpoint" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all" placeholder="tos-cn-beijing.volces.com" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">Region</label>
+              <input id="conf_tos_region" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all" placeholder="cn-beijing" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">Bucket Name</label>
+              <select id="conf_tos_bucket" class="w-full bg-white border border-gray-200 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[right:1rem_center] bg-no-repeat">
+                 <option value="" disabled selected>选择存储桶</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">Bucket Directory</label>
+              <div class="flex gap-2">
+                  <select id="conf_tos_directory" class="flex-1 bg-white border border-gray-200 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[right:1rem_center] bg-no-repeat">
+                     <option value="" disabled selected>请先选择存储桶</option>
+                  </select>
+                  <button type="button" onclick="createNewDirectory()" class="px-3 py-2 bg-orange-100 text-orange-600 rounded-lg hover:bg-orange-200 transition-colors text-sm font-medium">新建</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Models Config -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-sm text-gray-900 uppercase tracking-wider flex items-center">
+            <span class="w-1 h-4 bg-purple-600 mr-2 rounded-full"></span>
+            模型配置
+          </h4>
+          <div class="grid grid-cols-2 gap-5">
+            <div class="col-span-2">
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">LLM Model ID</label>
+              <input id="conf_llm" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">Image Model ID</label>
+              <input id="conf_img" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1.5">Video Model ID</label>
+              <input id="conf_vid" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+            </div>
+          </div>
+        </div>
+
+        <!-- System Prompts Config -->
+        <div class="space-y-4">
+          <h4 class="font-bold text-sm text-gray-900 uppercase tracking-wider flex items-center">
+            <span class="w-1 h-4 bg-green-600 mr-2 rounded-full"></span>
+            系统提示词配置
+          </h4>
+          <div class="space-y-4">
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">剧本创作 - System Prompt</label>
+                <textarea id="conf_prompt_script_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">分镜生成 - System Prompt</label>
+                <textarea id="conf_prompt_sb_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">图像提示词生成 - System Prompt</label>
+                <textarea id="conf_prompt_img_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">视频提示词生成 - System Prompt</label>
+                <textarea id="conf_prompt_vid_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">剧本优化 - System Prompt</label>
+                <textarea id="conf_prompt_script_opt_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">分镜优化 - System Prompt</label>
+                <textarea id="conf_prompt_sb_opt_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">角色设计 - System Prompt</label>
+                <textarea id="conf_prompt_char_design_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">角色提示词生成 - System Prompt</label>
+                <textarea id="conf_prompt_char_gen_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">场景设计 - System Prompt</label>
+                <textarea id="conf_prompt_scene_design_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+             <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1.5">场景提示词生成 - System Prompt</label>
+                <textarea id="conf_prompt_scene_gen_sys" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-sm focus:border-green-500 focus:ring-2 focus:ring-green-100 outline-none transition-all h-24"></textarea>
+             </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-100 flex justify-end space-x-3 bg-gray-50 rounded-b-2xl">
+        <button id="cancelSettings" class="px-6 py-2.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium transition-all shadow-sm">取消</button>
+        <button id="saveSettings" class="px-6 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md shadow-blue-200 transition-all">保存更改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Details Modal -->
+  <div id="projectDetailsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-opacity">
+    <div class="bg-white rounded-2xl w-[600px] shadow-2xl flex flex-col max-h-[90vh] animate-scale-in">
+      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
+        <h3 class="text-lg font-bold text-gray-800">📁 项目详情</h3>
+        <button id="closeProjectDetails" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+      </div>
+      <div class="p-8 overflow-y-auto space-y-6">
+        <div class="space-y-4">
+           <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">项目名称</label>
+              <div id="pd_name" class="text-lg font-bold text-slate-800"></div>
+           </div>
+           <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">项目 ID</label>
+              <div id="pd_id" class="text-sm font-mono text-slate-500 bg-gray-50 p-2 rounded border border-gray-200 inline-block"></div>
+           </div>
+           <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">项目状态</label>
+              <div id="pd_status" class="text-sm font-medium text-slate-700 bg-gray-100 px-2 py-1 rounded inline-block"></div>
+           </div>
+           <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">所属平台</label>
+              <div id="pd_platform" class="text-sm font-medium text-slate-700 bg-gray-100 px-2 py-1 rounded inline-block"></div>
+           </div>
+           <div>
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">当前阶段</label>
+              <div id="pd_current_stage" class="text-sm font-bold text-blue-600"></div>
+           </div>
+           <div class="grid grid-cols-2 gap-4">
+             <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">开始时间</label>
+                <div id="pd_created" class="text-sm text-slate-700"></div>
+             </div>
+             <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">结束/更新时间</label>
+                <div id="pd_updated" class="text-sm text-slate-700"></div>
+             </div>
+             <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Tokens 消耗</label>
+                <div id="pd_tokens" class="text-sm text-slate-700 font-mono"></div>
+             </div>
+             <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">视频总时长 (累计消耗)</label>
+                <div id="pd_video_duration" class="text-sm text-slate-700"></div>
+             </div>
+             <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">视频时长 (成片)</label>
+                <div id="pd_project_duration" class="text-sm text-slate-700"></div>
+             </div>
+             <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">画面比例</label>
+                <div id="pd_aspect_ratio" class="text-sm text-slate-700"></div>
+             </div>
+             <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">分辨率</label>
+                <div id="pd_resolution" class="text-sm text-slate-700"></div>
+             </div>
+             <div>
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">创建方式</label>
+                <div id="pd_input_type" class="text-sm text-slate-700"></div>
+             </div>
+           </div>
+           <div class="border-t border-gray-100 pt-4">
+              <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">项目概览 (累计消耗)</label>
+              <div class="grid grid-cols-3 gap-2 text-center">
+                 <div class="bg-blue-50 p-3 rounded-lg">
+                    <div class="text-xs text-blue-500 mb-1">分镜 (当前)</div>
+                    <div id="pd_shots_count" class="text-lg font-bold text-blue-700">-</div>
+                 </div>
+                 <div class="bg-purple-50 p-3 rounded-lg">
+                    <div class="text-xs text-purple-500 mb-1">图片 (累计)</div>
+                    <div id="pd_images_count" class="text-lg font-bold text-purple-700">-</div>
+                 </div>
+                 <div class="bg-green-50 p-3 rounded-lg">
+                    <div class="text-xs text-green-500 mb-1">视频 (累计)</div>
+                    <div id="pd_videos_count" class="text-lg font-bold text-green-700">-</div>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-100 flex justify-end space-x-3 bg-gray-50 rounded-b-2xl">
+        <button id="btnDeleteProject" class="px-6 py-2.5 rounded-lg bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 font-medium transition-all shadow-sm">删除项目</button>
+        <button id="btnOpenProject" class="px-6 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md shadow-blue-200 transition-all">打开项目</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Manager Modal -->
+  <div id="projectManagerModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-opacity">
+    <div class="bg-white rounded-2xl w-[900px] h-[80vh] shadow-2xl flex flex-col animate-scale-in">
+      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
+        <h3 class="text-lg font-bold text-gray-800">🗂 项目管理</h3>
+        <button id="closeProjectManager" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+      </div>
+      
+      <!-- Filter Bar -->
+      <div class="p-6 border-b border-gray-100 bg-white grid grid-cols-4 gap-4">
+           <div class="col-span-4 md:col-span-2">
+               <div class="relative">
+                   <input type="text" id="pmSearch" placeholder="搜索项目名称..." class="w-full bg-gray-50 border border-gray-200 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                   <svg class="w-4 h-4 text-gray-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+               </div>
+           </div>
+           <div>
+               <select id="pmFilterStatus" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm outline-none focus:border-blue-500 transition-all">
+                   <option value="">所有状态</option>
+                   <option value="pending">进行中</option>
+                   <option value="completed">已完成</option>
+               </select>
+           </div>
+           <div>
+               <select id="pmFilterPlatform" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm outline-none focus:border-blue-500 transition-all">
+                   <option value="">所有平台</option>
+                   <option value="volcengine">Volcengine</option>
+                   <option value="byteplus">BytePlus</option>
+               </select>
+           </div>
+           <div>
+               <select id="pmFilterInputType" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm outline-none focus:border-blue-500 transition-all">
+                   <option value="">所有创建方式</option>
+                   <option value="topic">基于主题</option>
+                   <option value="script">上传剧本</option>
+               </select>
+           </div>
+           <div>
+               <select id="pmFilterRatio" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm outline-none focus:border-blue-500 transition-all">
+                   <option value="">所有比例</option>
+                   <option value="16:9">16:9</option>
+                   <option value="9:16">9:16</option>
+                   <option value="1:1">1:1</option>
+                   <option value="4:3">4:3</option>
+                   <option value="3:4">3:4</option>
+                   <option value="21:9">21:9</option>
+               </select>
+           </div>
+           <div>
+               <select id="pmFilterResolution" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm outline-none focus:border-blue-500 transition-all">
+                   <option value="">所有分辨率</option>
+                   <option value="1080p">1080p</option>
+                   <option value="720p">720p</option>
+                   <option value="480p">480p</option>
+               </select>
+           </div>
+           <div class="flex items-center justify-end">
+               <button id="pmResetFilter" class="text-sm text-gray-500 hover:text-gray-700 px-4 py-2 hover:bg-gray-100 rounded-lg transition-all">重置筛选</button>
+           </div>
+      </div>
+
+      <!-- Project List -->
+      <div class="flex-1 overflow-y-auto p-6 bg-gray-50/50">
+        <div id="pmList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Project items will be injected here -->
+        </div>
+        <div id="pmEmpty" class="hidden flex flex-col items-center justify-center h-full text-gray-400">
+            <svg class="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <p>没有找到符合条件的项目</p>
+        </div>
+        <div id="pmLoading" class="hidden absolute inset-0 bg-white/50 backdrop-blur-sm flex flex-col items-center justify-center z-10">
+            <div class="w-10 h-10 border-4 border-blue-400 border-t-blue-600 rounded-full animate-spin mb-3"></div>
+            <p class="text-blue-600 font-medium">加载中...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Old Filter Panel Removed -->
+  
+  <!-- Logs Modal -->
+  <div id="logsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50 transition-opacity">
+    <div class="bg-white rounded-2xl w-[900px] shadow-2xl flex flex-col max-h-[90vh] animate-scale-in">
+      <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-2xl">
+        <div class="flex items-center space-x-4">
+            <h3 class="text-lg font-bold text-gray-800">📜 系统日志</h3>
+            <div class="flex space-x-2">
+                <select id="logLevelFilter" class="text-sm border border-gray-200 rounded-lg px-3 py-1 bg-white outline-none appearance-none pr-8 bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364748b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px_10px] bg-[right:0.5rem_center] bg-no-repeat">
+                    <option value="">所有级别</option>
+                    <option value="INFO">INFO</option>
+                    <option value="ERROR">ERROR</option>
+                    <option value="WARN">WARN</option>
+                </select>
+                <button id="refreshLogsBtn" class="px-3 py-1 bg-blue-100 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-200">刷新</button>
+            </div>
+        </div>
+        <button id="closeLogs" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+      </div>
+      <div class="p-0 flex-1 bg-slate-900 flex flex-col min-h-0">
+        <div id="logsContent" class="flex-1 overflow-y-auto p-4 font-mono text-sm text-gray-300 space-y-1">
+            <!-- Logs injected here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fade-in 0.4s ease-out forwards; }
+    @keyframes scale-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    .animate-scale-in { animation: scale-in 0.2s ease-out forwards; }
+  </style>
+
+  <script src="/static/app.js?v=11"></script>
+</body>
+</html>

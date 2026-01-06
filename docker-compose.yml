@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: short-drama-app
+    restart: unless-stopped
+    volumes:
+      - ./config:/app/short_drama_studio/config
+      - ./data:/app/short_drama_studio/data
+      - ./logs:/app/short_drama_studio/logs
+    environment:
+      - WEB_SERVER_HOST=0.0.0.0
+      - TZ=Asia/Shanghai
+      # Uncomment to use Postgres/Redis via Env (Priority > config.yaml)
+      # - DATABASE_URL=postgresql://user:password@postgres:5432/short_drama
+      # - REDIS_URL=redis://redis:6379/0
+    expose:
+      - "8000"
+    depends_on:
+      - redis
+      - postgres
+
+  nginx:
+    image: nginx:1.24-alpine
+    container_name: short-drama-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./web:/usr/share/nginx/html/web:ro
+      - ./data:/usr/share/nginx/html/data:ro
+    depends_on:
+      - app
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: short-drama-redis
+    restart: unless-stopped
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: short-drama-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: short_drama
+    expose:
+      - "5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  redis_data:
+  postgres_data:
