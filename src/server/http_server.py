@@ -1225,9 +1225,19 @@ async def _regenerate_single_prompt(request):
             
         meta = project.topic_meta or {}
         style = meta.get("visual_style", "cinematic")
-            
+
+        # Get characters and scenes for reference
+        characters = project.characters or []
+        scenes = project.scenes or []
+
         if p_type == "image":
-            prompt_data, tokens = await _run_blocking(prompt_gen.regenerate_single_image_prompt, target_shot, style)
+            prompt_data, tokens = await _run_blocking(
+                prompt_gen.regenerate_single_image_prompt,
+                target_shot,
+                style,
+                characters=characters,
+                scenes=scenes
+            )
             
             # Update prompts list
             prompts = copy.deepcopy(project.image_prompts or [])

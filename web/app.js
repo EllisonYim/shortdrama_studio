@@ -2049,23 +2049,39 @@ function renderImages(p) {
             }
         }
 
-        // Also check if any other characters are mentioned in prompt? 
-        // For now, let's just stick to structured data. 
-        // User asked to show ALL important characters if mentioned.
-        // But we only have shot.character (single) in current data model.
-        // We might need to scan the prompt or update backend to support multiple characters per shot.
-        // As a workaround, we can check if any OTHER character names appear in the description or prompt.
+        // Scan ALL characters that appear in any text field (character, description, dialogue, action, prompt)
+        // This ensures all mentioned characters are shown, not just the one in shot.character field
         if (p.characters) {
+            // Combine all text fields to scan for character names
+            const textToScan = [
+                shot.character || '',
+                shot.description || '',
+                shot.dialogue || '',
+                shot.action || '',
+                promptText || ''
+            ].join(' ');
+
+            // Track which characters we've already added
+            const addedChars = new Set();
+            if (shot.character) {
+                addedChars.add(shot.character);
+            }
+
             p.characters.forEach(c => {
-                if (c.name !== shot.character && (shot.description?.includes(c.name) || shot.dialogue?.includes(c.name))) {
-                     const img = c.image_path ? 
+                // Skip if already added as primary character
+                if (addedChars.has(c.name)) return;
+
+                // Check if this character is mentioned anywhere in the text
+                if (c.name && textToScan.includes(c.name)) {
+                    addedChars.add(c.name);
+                    const img = c.image_path ?
                         `<div class="relative group cursor-zoom-in" onclick="zoomImage('${normalizePath(c.image_path)}')">
                             <img src="${normalizePath(c.image_path)}" class="w-8 h-8 rounded-full object-cover border border-gray-200" title="参考图">
                             <div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 rounded-full transition-opacity"></div>
-                         </div>` : 
+                         </div>` :
                         '<span class="text-xs text-gray-300">无图</span>';
-                     
-                     refs.push(`
+
+                    refs.push(`
                         <div class="flex items-center space-x-2 bg-gray-50 px-2 py-1 rounded text-xs border border-gray-100">
                             <span class="text-gray-500 font-bold">角色:</span>
                             <span class="text-gray-700 truncate max-w-[100px]" title="${escapeHtml(c.name)}">${escapeHtml(c.name)}</span>

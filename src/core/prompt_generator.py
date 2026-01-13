@@ -128,13 +128,20 @@ class PromptGenerator:
         # 1. Extract Character Info
         char_info_str = "无特定角色"
         char_name = shot.get("character", "")
-        # Find all characters mentioned in description/dialogue to be safe
+        # Find all characters mentioned in any text field to be comprehensive
         mentioned_chars = []
         if characters:
-             for c in characters:
-                 c_name = c.get("name")
-                 if c_name and (c_name == char_name or c_name in shot.get("description", "") or c_name in shot.get("dialogue", "")):
-                     mentioned_chars.append(c)
+            # Combine all text fields to scan for character names
+            text_to_scan = " ".join([
+                str(shot.get("character", "")),
+                str(shot.get("description", "")),
+                str(shot.get("dialogue", "")),
+                str(shot.get("action", ""))
+            ])
+            for c in characters:
+                c_name = c.get("name")
+                if c_name and c_name in text_to_scan:
+                    mentioned_chars.append(c)
         
         if mentioned_chars:
             char_infos = []
