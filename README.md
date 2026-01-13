@@ -89,7 +89,7 @@ pip install -r requirements.txt
 python run.py
 ```
 
-服务启动后，请在浏览器访问: `http://localhost:8000`
+服务启动后，请在浏览器访问: `http://localhost:8080`
 
 ## 🐳 Docker 部署 (推荐)
 
@@ -110,8 +110,13 @@ docker-compose logs -f app
 ### 2. 访问服务
 
 启动成功后，访问: `http://localhost:8080`
-- 8080 端口由 Nginx 代理，提供静态资源缓存和 API 转发。
-- 后端 API 服务默认运行在容器内部 8000 端口。
+
+| 部署方式 | 访问地址 | 说明 |
+|---------|---------|------|
+| 本地运行 | `http://localhost:8080` | 直接访问 Python 后端 |
+| Docker 部署 | `http://localhost:8080` | Nginx 代理，后端运行在容器内部 8000 端口 |
+
+> **注意**: 如果本地有其他 nginx 进程占用 8080 端口，请先停止该进程，否则会导致访问到错误的页面。
 
 ### 3. 数据库切换
 

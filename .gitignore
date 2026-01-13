@@ -42,3 +42,8 @@ logs/
 data/
 *.log
 .DS_Store
+
+#claude
+CLAUDE.md
+test_full_flow.py
+config/config.yaml
